@@ -32,6 +32,14 @@ export default (req, res) => {
   text += SUFFIX
   console.log({ text })
 
+  // split text into tweet-sized chunks
+  const tweets = []
+  for (let chunk of tweets.split(" ")) {
+    if (tweets[tweets.length - 1] + chunk.length + 1 > 280) tweets.push("")
+    tweets[tweets.length - 1] += chunk
+  }
+  console.log({ tweets })
+
   // TODO send all tweets, reply-chained into a thread
 
   // TODO change to 201 once implemented
