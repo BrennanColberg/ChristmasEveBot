@@ -1,6 +1,15 @@
+import Twitter from "twitter"
+
 const PREFIX = "Merry Christmas"
 const EVE = " Eve"
 const SUFFIX = "!"
+
+const twitter = new Twitter({
+  consumer_key: process.env.TWITTER_API_KEY,
+  consumer_secret: process.env.TWITTER_API_KEY_SECRET,
+  access_token_key: process.env.TWITTER_ACCESS_TOKEN,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+})
 
 export default (req, res) => {
   // request must use POST method
@@ -41,7 +50,11 @@ export default (req, res) => {
   }
   console.log({ tweets })
 
-  // TODO send all tweets, reply-chained into a thread
+  // send all tweets, reply-chained into a thread
+  const response = await twitter.post("/statuses/update", {
+    status: tweets[0],
+  })
+  console.log({ response })
 
   // TODO change to 201 once implemented
   res
