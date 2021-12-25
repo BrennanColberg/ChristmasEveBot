@@ -1,3 +1,7 @@
+const PREFIX = "Merry Christmas"
+const EVE = " Eve"
+const SUFFIX = "!"
+
 export default (req, res) => {
   // request must use POST method
   if (req.method !== "POST") return res.status(405).end()
@@ -22,7 +26,15 @@ export default (req, res) => {
   const daysUntilChristmas = (christmas - today) / 1000 / 60 / 60 / 24
   console.log({ daysUntilChristmas })
 
-  // TODO see how many tweets will be needed to fit all "Eve"s
+  // stage the necessary text into tweets
+  const tweetsText = [PREFIX]
+  for (let i = 0; i < daysUntilChristmas; i++) {
+    const newText = i === daysUntilChristmas - 1 ? EVE + SUFFIX : EVE
+    if (tweetsText[tweetsText - 1].length + newText > 280) tweetsText.push("")
+    tweetsText[tweetsText - 1] += newText
+  }
+  console.log({ tweetsText })
+
   // TODO send all tweets, reply-chained into a thread
 
   // TODO change to 201 once implemented
