@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
   console.log({ today })
 
   // figure out how many days there are until next Christmas
-  if (month === 11 && day > 25) year += 1
+  if (month === 11 && day >= 25) year += 1
   const christmas = new Date(year, 11, 25)
   console.log({ christmas })
   const daysUntilChristmas = (christmas - today) / 1000 / 60 / 60 / 24
