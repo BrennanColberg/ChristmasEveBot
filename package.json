@@ -1,0 +1,6 @@
+{
+	"name": "christmasevebot",
+	"dependencies": {
+		"twitter": "1.7.1"
+	}
+}
