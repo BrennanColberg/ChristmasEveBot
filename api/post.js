@@ -51,8 +51,6 @@ module.exports = async (req, res) => {
   console.log({ tweets })
 
   // send all tweets, reply-chained into a thread
-  console.log({ env: process.env })
-
   let in_reply_to_status_id = undefined
   for (let status of tweets) {
     const response = await twitter.post("/statuses/update", {
