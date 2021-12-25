@@ -26,5 +26,5 @@ export default (req, res) => {
   // TODO send all tweets, reply-chained into a thread
 
   // TODO change to 201 once implemented
-  res.statusCode(501).end()
+  res.status(501).end()
 }
