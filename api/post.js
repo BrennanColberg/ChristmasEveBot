@@ -21,9 +21,9 @@ module.exports = async (req, res) => {
   // get current day
   const now = new Date()
   console.log({ now })
-  const year = parseInt(req.query.year) || now.getFullYear()
-  const month = parseInt(req.query.month) - 1 ?? now.getMonth()
-  const day = parseInt(req.query.day) || now.getDate()
+  const year = now.getFullYear()
+  const month = now.getMonth()
+  const day = now.getDate()
   console.log({ year, month, day })
   const today = new Date(year, month, day)
   console.log({ today })
