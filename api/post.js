@@ -42,12 +42,17 @@ module.exports = async (req, res) => {
   console.log({ text })
 
   // split text into tweet-sized chunks
-  const tweets = [""]
+  let tweets = [""] // in "reverse order" (0 = last tweet) while being composed
   for (let chunk of text.split(" ")) {
-    if (tweets[tweets.length - 1].length + 1 + chunk.length > 280) tweets.push("")
-    if (tweets[tweets.length - 1]) tweets[tweets.length - 1] += " "
-    tweets[tweets.length - 1] += chunk
+    const newText = chunk + " "
+    if (tweets[0].length + newText.length > 280 - 5) {
+      tweets[0] += `(${tweets.length}/?)`
+      tweets = ["", ...tweets]
+    }
+    tweets[0] += newText
   }
+  if (tweets.length > 1) tweets[0] += `(${tweets.length}/?)`
+  tweets = tweets.map((tweet) => tweet.replace("?", tweets.length).trim()).reverse()
   console.log({ tweets })
 
   // send all tweets, reply-chained into a thread
