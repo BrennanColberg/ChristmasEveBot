@@ -12,9 +12,9 @@ export default (req, res) => {
   // get current day
   const now = new Date()
   console.log({ now })
-  const year = now.getFullYear()
-  const month = now.getMonth()
-  const day = now.getDate()
+  const year = req.body.year || now.getFullYear()
+  const month = req.body.month || now.getMonth()
+  const day = req.body.day || now.getDate()
   console.log({ year, month, day })
   const today = new Date(year, month, day)
   console.log({ today })
