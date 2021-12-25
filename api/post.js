@@ -34,7 +34,7 @@ export default (req, res) => {
 
   // split text into tweet-sized chunks
   const tweets = []
-  for (let chunk of tweets.split(" ")) {
+  for (let chunk of text.split(" ")) {
     if (tweets[tweets.length - 1] + chunk.length + 1 > 280) tweets.push("")
     tweets[tweets.length - 1] += chunk
   }
