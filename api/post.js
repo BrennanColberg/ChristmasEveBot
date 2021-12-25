@@ -1,6 +1,6 @@
 export default (req, res) => {
   // request must use POST method
-  if (req.method !== "POST") return res.status(405).end(405)
+  if (req.method !== "POST") return res.status(405).end()
 
   // request must be authenticated
   if (req.headers["x-api-key"] !== process.env.API_KEY) return res.status(401).end()
