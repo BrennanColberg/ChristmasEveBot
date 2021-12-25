@@ -43,5 +43,7 @@ export default (req, res) => {
   // TODO send all tweets, reply-chained into a thread
 
   // TODO change to 201 once implemented
-  res.status(501).end()
+  res
+    .status(501)
+    .send({ now, year, month, day, today, christmas, daysUntilChristmas, text, tweets })
 }
