@@ -44,14 +44,14 @@ module.exports = async (req, res) => {
   // split text into tweet-sized chunks
   let tweets = [""] // in "reverse order" (0 = last tweet) while being composed
   for (let chunk of text.split(" ")) {
-    const newText = chunk + " "
-    if (tweets[0].length + newText.length > 280 - 5) {
-      tweets[0] += `(${tweets.length}/?)`
+    const newText = " " + chunk
+    if (tweets[0].length + newText.length > 280 - 7) {
+      tweets[0] += `… (${tweets.length}/?)`
       tweets = ["", ...tweets]
     }
     tweets[0] += newText
   }
-  if (tweets.length > 1) tweets[0] += `(${tweets.length}/?)`
+  if (tweets.length > 1) tweets[0] += ` (${tweets.length}/?)`
   tweets = tweets.map((tweet) => tweet.replace("?", tweets.length).trim()).reverse()
   console.log({ tweets })
 
