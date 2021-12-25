@@ -1,6 +1,7 @@
 {
-	"name": "christmasevebot",
-	"dependencies": {
-		"twitter": "1.7.1"
-	}
+  "name": "christmasevebot",
+  "type": "module",
+  "dependencies": {
+    "twitter": "1.7.1"
+  }
 }
