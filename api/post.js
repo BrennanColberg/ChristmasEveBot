@@ -4,13 +4,6 @@ const PREFIX = "Merry Christmas"
 const EVE = " Eve"
 const SUFFIX = "!"
 
-const twitter = new Twitter({
-  consumer_key: process.env.TWITTER_API_KEY,
-  consumer_secret: process.env.TWITTER_API_KEY_SECRET,
-  access_token_key: process.env.TWITTER_ACCESS_TOKEN,
-  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
-})
-
 module.exports = async (req, res) => {
   // request must use POST method
   if (req.method !== "POST") return res.status(405).end()
@@ -51,6 +44,13 @@ module.exports = async (req, res) => {
   console.log({ tweets })
 
   // send all tweets, reply-chained into a thread
+  console.log({ env: process.env })
+  const twitter = new Twitter({
+    consumer_key: process.env.TWITTER_API_KEY,
+    consumer_secret: process.env.TWITTER_API_KEY_SECRET,
+    access_token_key: process.env.TWITTER_ACCESS_TOKEN,
+    access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+  })
   const response = await twitter.post("/statuses/update", {
     status: tweets[0],
   })
