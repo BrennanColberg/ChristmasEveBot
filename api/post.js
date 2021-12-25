@@ -1,4 +1,4 @@
-import Twitter from "twitter"
+const Twitter = require("twitter")
 
 const PREFIX = "Merry Christmas"
 const EVE = " Eve"
@@ -11,7 +11,7 @@ const twitter = new Twitter({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 })
 
-export default (req, res) => {
+module.exports = (req, res) => {
   // request must use POST method
   if (req.method !== "POST") return res.status(405).end()
 
