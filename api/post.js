@@ -11,7 +11,7 @@ const twitter = new Twitter({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 })
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
   // request must use POST method
   if (req.method !== "POST") return res.status(405).end()
 
