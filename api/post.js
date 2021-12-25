@@ -51,17 +51,18 @@ module.exports = async (req, res) => {
   console.log({ tweets })
 
   // send all tweets, reply-chained into a thread
-  let in_reply_to_status_id = undefined
-  for (let status of tweets) {
+  const tweetIds = []
+  for (let tweet of tweets) {
     const response = await twitter.post("/statuses/update", {
-      status,
-      in_reply_to_status_id,
+      status: tweet,
+      in_reply_to_status_id: tweetIds[tweetIds.length - 1],
     })
-    in_reply_to_status_id = response.id_str
+    tweetIds.push(response.id_str)
   }
+  console.log({ tweetIds })
 
-  // TODO change to 201 once implemented
+  // return lots of info for easy API debugging
   res
-    .status(501)
-    .json({ now, year, month, day, today, christmas, daysUntilChristmas, text, tweets })
+    .status(201)
+    .json({ now, year, month, day, today, christmas, daysUntilChristmas, text, tweets, tweetIds })
 }
