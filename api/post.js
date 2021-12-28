@@ -60,6 +60,9 @@ module.exports = async (req, res) => {
   for (let tweet of tweets) {
     const response = await twitter.post("/statuses/update", {
       status: tweet,
+      // NOTE: this has *failed* in the past to post every tweet in the
+      //       same thread; they're all posted, the links are just broken
+      //       at some point for some reason. diagnosis still TBD
       in_reply_to_status_id: tweetIds[tweetIds.length - 1],
     })
     tweetIds.push(response.id_str)
