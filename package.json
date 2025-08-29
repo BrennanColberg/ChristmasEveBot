@@ -1,6 +1,27 @@
 {
-  "name": "christmasevebot",
-  "dependencies": {
-    "twitter": "1.7.1"
-  }
+	"name": "ChristmasEveBot",
+	"version": "2",
+	"module": "src/server.ts",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"start": "bun run src/server.ts"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/express": "^5.0.0",
+		"@types/node": "^22.0.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"express": "^5.1.0",
+		"crypto": "^1.0.1"
+	},
+	"prettier": {
+		"tabWidth": 2,
+		"semi": false,
+		"printWidth": 100
+	}
 }
