@@ -30,7 +30,7 @@ router.post("/", async (req: Request, res: Response) => {
     // Get bot auth tokens from Redis, init the client
     let authData = await getAuthData()
     if (!authData) return res.status(404).json({ error: `No auth data found for bot` })
-    if (authData.refresh_token) {
+    if (authData.refresh_token && authData.expires_at && authData.expires_at < Date.now()) {
       const user = new OAuth2User({
         client_id: process.env.TWITTER_CLIENT_ID!,
         client_secret: process.env.TWITTER_CLIENT_SECRET,
