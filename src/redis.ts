@@ -6,9 +6,9 @@ const REDIS_KEY = `ChristmasEveBot/oauth`
 
 export interface BotAuthData {
   access_token: string
-  refresh_token?: string
+  refresh_token: string
   expires_in?: number
-  scope?: string
+  scope: string
   created_at: number
 }
 
@@ -19,5 +19,6 @@ export async function storeAuthData(authData: BotAuthData) {
 
 export async function getAuthData(): Promise<BotAuthData | null> {
   const data = await redis.get(REDIS_KEY)
+  console.log("authData", JSON.stringify(data))
   return data ? JSON.parse(data) : null
 }
