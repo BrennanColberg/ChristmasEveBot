@@ -57,7 +57,7 @@ router.get("/", (req: Request, res: Response) => {
   authUrl.searchParams.append("code_challenge", codeChallenge)
   authUrl.searchParams.append("code_challenge_method", "S256")
 
-  console.log("Redirecting to Twitter OAuth:", authUrl.toString())
+  console.log("Redirecting to Twitter OAuth:", authUrl.toString().replace("twitter.com", "x.com"))
   res.redirect(authUrl.toString())
 })
 
