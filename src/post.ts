@@ -34,20 +34,20 @@ router.post("/", async (req: Request, res: Response) => {
 
     // Get current date
     const now = new Date()
-    console.log({ now })
+    console.log("now", now)
     let year = now.getFullYear()
     const month = now.getMonth()
     const day = now.getDate()
-    console.log({ year, month, day })
+    console.log("year, month, day", year, month, day)
     const today = new Date(year, month, day)
-    console.log({ today })
+    console.log("today", today)
 
     // Figure out how many days there are until next Christmas
     if (month === 11 && day > 25) year += 1
     const christmas = new Date(year, 11, 25)
-    console.log({ christmas })
+    console.log("christmas", christmas)
     const daysUntilChristmas = (christmas.getTime() - today.getTime()) / 1000 / 60 / 60 / 24
-    console.log({ daysUntilChristmas })
+    console.log("daysUntilChristmas", daysUntilChristmas)
 
     // Generate the necessary text
     const PREFIX = "Merry Christmas"
@@ -71,7 +71,7 @@ router.post("/", async (req: Request, res: Response) => {
     }
     if (tweets.length > 1) tweets[0] += ` (${tweets.length}/?)`
     tweets = tweets.map((tweet) => tweet.replace("?", tweets.length.toString()).trim()).reverse()
-    console.log({ tweets })
+    console.log("tweets", JSON.stringify(tweets))
 
     // Send all tweets using Twitter API v2, reply-chained into a thread
     const tweetIds: string[] = []
@@ -88,6 +88,7 @@ router.post("/", async (req: Request, res: Response) => {
         }
       }
 
+      console.log("tweetPayload", JSON.stringify(tweetPayload))
       const response = await client.tweets.createTweet(tweetPayload)
       if (response.errors) {
         const errorText = JSON.stringify(response.errors)
@@ -101,13 +102,13 @@ router.post("/", async (req: Request, res: Response) => {
       }
 
       if (response.data) {
-        const result = response.data?.id
-        tweetIds.push(result.data.id)
-        console.log(`Posted tweet ${tweetIds.length}/${tweets.length}: ${result.data.id}`)
+        const result = response.data
+        tweetIds.push(result.id)
+        console.log(`Posted tweet ${tweetIds.length}/${tweets.length}: ${result.id}`)
       }
     }
 
-    console.log({ tweetIds })
+    console.log("tweetIds", JSON.stringify(tweetIds))
 
     // Return lots of info for easy API debugging
     res.status(201).json({
