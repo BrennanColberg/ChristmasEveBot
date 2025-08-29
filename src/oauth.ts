@@ -50,7 +50,7 @@ router.get("/", (req: Request, res: Response) => {
   authUrl.searchParams.append("response_type", "code")
   authUrl.searchParams.append("client_id", TWITTER_CLIENT_ID)
   authUrl.searchParams.append("redirect_uri", TWITTER_REDIRECT_URI)
-  authUrl.searchParams.append("scope", "tweet.write offline.access users.read")
+  authUrl.searchParams.append("scope", "tweet.read tweet.write offline.access users.read")
   authUrl.searchParams.append("state", state)
   authUrl.searchParams.append("code_challenge", codeChallenge)
   authUrl.searchParams.append("code_challenge_method", "S256")
