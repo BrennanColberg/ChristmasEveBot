@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from "express"
-import { getAuthData } from "./redis"
+import { getAuthData, storeAuthData } from "./redis"
 import Client from "twitter-api-sdk"
+import { OAuth2User, type OAuth2UserOptions } from "twitter-api-sdk/dist/OAuth2User"
 
 const router = express.Router()
 
@@ -27,10 +28,26 @@ router.post("/", async (req: Request, res: Response) => {
 
   try {
     // Get bot auth tokens from Redis, init the client
-    const authData = await getAuthData()
+    let authData = await getAuthData()
     if (!authData) return res.status(404).json({ error: `No auth data found for bot` })
-    // TODO use refresh token here
-    const client = new Client(authData.access_token)
+    if (authData.refresh_token) {
+      const user = new OAuth2User({
+        client_id: process.env.TWITTER_CLIENT_ID!,
+        client_secret: process.env.TWITTER_CLIENT_SECRET,
+        scopes: ["tweet.read", "tweet.write", "offline.access", "users.read"],
+        callback: process.env.TWITTER_REDIRECT_URI!,
+        token: authData,
+      })
+      try {
+        const { token } = await user.refreshAccessToken()
+        console.log("refreshed access token", JSON.stringify(token))
+        await storeAuthData(token)
+        authData = token
+      } catch (error) {
+        console.error("failed to refresh access token", JSON.stringify(error))
+      }
+    }
+    const client = new Client(authData.access_token!)
 
     // Get current date
     const now = new Date()

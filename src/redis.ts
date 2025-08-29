@@ -1,16 +1,11 @@
 import { redis } from "bun"
+import type { OAuth2User } from "twitter-api-sdk/dist/OAuth2User"
 
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379"
 if (!REDIS_URL) throw "REDIS_URL environment variable is not set"
 const REDIS_KEY = `ChristmasEveBot/oauth`
 
-export interface BotAuthData {
-  access_token: string
-  refresh_token: string
-  expires_in?: number
-  scope: string
-  created_at: number
-}
+export type BotAuthData = Awaited<ReturnType<OAuth2User["refreshAccessToken"]>>["token"]
 
 export async function storeAuthData(authData: BotAuthData) {
   await redis.set(REDIS_KEY, JSON.stringify(authData))

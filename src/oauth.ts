@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from "express"
 import crypto from "crypto"
 import { storeAuthData } from "./redis"
+import { OAuth2User } from "twitter-api-sdk/dist/OAuth2User"
 
 const router = express.Router()
 
@@ -30,6 +31,13 @@ interface BotAuthData {
   scope?: string
   created_at: number
 }
+
+export const twitterAuthClient = new OAuth2User({
+  client_id: TWITTER_CLIENT_ID,
+  client_secret: TWITTER_CLIENT_SECRET,
+  callback: TWITTER_REDIRECT_URI,
+  scopes: ["tweet.read", "tweet.write", "offline.access", "users.read"],
+})
 
 // Start OAuth flow
 router.get("/", (req: Request, res: Response) => {
@@ -76,61 +84,17 @@ router.get("/callback", async (req: Request, res: Response) => {
 
   try {
     // Exchange authorization code for access token
-    const tokenResponse = await fetch("https://api.twitter.com/2/oauth2/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Basic ${Buffer.from(
-          `${TWITTER_CLIENT_ID}:${TWITTER_CLIENT_SECRET}`
-        ).toString("base64")}`,
-      },
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
-        code: code as string,
-        redirect_uri: TWITTER_REDIRECT_URI,
-        code_verifier: codeVerifier,
-      }),
-    })
-
-    if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text()
-      console.error("Token exchange failed:", errorText)
-      return res.type("text/plain").status(400).send(`Token exchange failed: ${errorText}`)
-    }
-
-    const tokens = (await tokenResponse.json()) as {
-      access_token?: string
-      refresh_token?: string
-      expires_in?: number
-      scope?: string
-    }
-
-    console.log("OAuth Success! Tokens received:", {
-      access_token: tokens.access_token ? "RECEIVED" : "MISSING",
-      refresh_token: tokens.refresh_token ? "RECEIVED" : "MISSING",
-      expires_in: tokens.expires_in,
-      scope: tokens.scope,
-    })
-
-    // Store tokens in Redis
-    if (tokens.access_token) {
-      const authData: BotAuthData = {
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_in: tokens.expires_in,
-        scope: tokens.scope,
-        created_at: Date.now(),
-      }
-      await storeAuthData(authData)
-    }
+    const { token } = await twitterAuthClient.requestAccessToken(code as string)
+    console.log("OAuth Success! Token received:", token)
+    await storeAuthData(token)
 
     // Return tokens as plaintext for the bot to capture
     res.type("text/plain").send(`OAuth Success!
 
-ACCESS_TOKEN: ${tokens.access_token || "MISSING"}
-REFRESH_TOKEN: ${tokens.refresh_token || "MISSING"}
-EXPIRES_IN: ${tokens.expires_in || "UNKNOWN"}
-SCOPE: ${tokens.scope || "UNKNOWN"}
+ACCESS_TOKEN: ${token.access_token || "MISSING"}
+REFRESH_TOKEN: ${token.refresh_token || "MISSING"}
+SCOPE: ${token.scope || "UNKNOWN"}
+EXPIRES_AT: ${token.expires_at || "UNKNOWN"}
 
 Tokens have been stored in Redis`)
   } catch (error) {
