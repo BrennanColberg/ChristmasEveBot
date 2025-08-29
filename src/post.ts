@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from "express"
-import { redis } from "bun"
-import { REDIS_KEY } from "./oauth"
+import { getAuthData } from "./redis"
+import Client from "twitter-api-sdk"
 
 const router = express.Router()
 
@@ -23,10 +23,14 @@ router.post("/", async (req: Request, res: Response) => {
     return res.status(401).json({ error: "Unauthorized - invalid API key" })
   }
 
+  // Initialize the Twitter client
+
   try {
-    // Get bot auth tokens from Redis
-    const authData = await redis.get(REDIS_KEY)
+    // Get bot auth tokens from Redis, init the client
+    const authData = await getAuthData()
     if (!authData) return res.status(404).json({ error: `No auth data found for bot` })
+    // TODO use refresh token here
+    const client = new Client(authData.access_token)
 
     // Get current date
     const now = new Date()
@@ -59,7 +63,7 @@ router.post("/", async (req: Request, res: Response) => {
     let tweets = [""] // in "reverse order" (0 = last tweet) while being composed
     for (let chunk of text.split(" ")) {
       const newText = " " + chunk
-      if (tweets[0].length + newText.length > 280 - 7) {
+      if (tweets[0]!.length + newText.length > 280 - 7) {
         tweets[0] += `… (${tweets.length}/?)`
         tweets = ["", ...tweets]
       }
@@ -84,17 +88,9 @@ router.post("/", async (req: Request, res: Response) => {
         }
       }
 
-      const response = await fetch("https://api.twitter.com/2/tweets", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${authData.access_token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(tweetPayload),
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
+      const response = await client.tweets.createTweet(tweetPayload)
+      if (response.errors) {
+        const errorText = JSON.stringify(response.errors)
         console.error("Tweet posting failed:", errorText)
         return res.status(500).json({
           error: "Failed to post tweet",
@@ -104,9 +100,11 @@ router.post("/", async (req: Request, res: Response) => {
         })
       }
 
-      const result = (await response.json()) as { data: { id: string } }
-      tweetIds.push(result.data.id)
-      console.log(`Posted tweet ${tweetIds.length}/${tweets.length}: ${result.data.id}`)
+      if (response.data) {
+        const result = response.data?.id
+        tweetIds.push(result.data.id)
+        console.log(`Posted tweet ${tweetIds.length}/${tweets.length}: ${result.data.id}`)
+      }
     }
 
     console.log({ tweetIds })

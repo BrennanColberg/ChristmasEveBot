@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from "express"
 import crypto from "crypto"
-import { redis } from "bun"
+import { storeAuthData } from "./redis"
 
 const router = express.Router()
 
@@ -9,8 +9,6 @@ const TWITTER_CLIENT_ID = process.env.TWITTER_CLIENT_ID!
 const TWITTER_CLIENT_SECRET = process.env.TWITTER_CLIENT_SECRET!
 const TWITTER_REDIRECT_URI =
   process.env.TWITTER_REDIRECT_URI || "http://localhost:3000/oauth/callback"
-export const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379"
-export const REDIS_KEY = `ChristmasEveBot/oauth`
 
 // Store code verifier temporarily (in production, use proper session storage)
 const codeVerifierStore = new Map<string, string>()
@@ -123,8 +121,7 @@ router.get("/callback", async (req: Request, res: Response) => {
         scope: tokens.scope,
         created_at: Date.now(),
       }
-      await redis.set(REDIS_KEY, JSON.stringify(authData))
-      await redis.expire(REDIS_KEY, 86400 * 30) // 30 days
+      await storeAuthData(authData)
     }
 
     // Return tokens as plaintext for the bot to capture

@@ -16,8 +16,9 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
+		"crypto": "^1.0.1",
 		"express": "^5.1.0",
-		"crypto": "^1.0.1"
+		"twitter-api-sdk": "^1.2.1"
 	},
 	"prettier": {
 		"tabWidth": 2,
