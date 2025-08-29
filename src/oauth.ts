@@ -2,6 +2,7 @@ import express, { type Request, type Response } from "express"
 import crypto from "crypto"
 import { storeAuthData } from "./redis"
 import { OAuth2User } from "twitter-api-sdk/dist/OAuth2User"
+import Client from "twitter-api-sdk"
 
 const router = express.Router()
 
@@ -85,7 +86,23 @@ router.get("/callback", async (req: Request, res: Response) => {
   try {
     // Exchange authorization code for access token
     const { token } = await twitterAuthClient.requestAccessToken(code as string)
+    if (!token.access_token) throw new Error("Access token is missing")
     console.log("OAuth Success! Token received:", token)
+
+    const botTwitterClient = new Client(token.access_token)
+    const twitterUserResponse = await botTwitterClient.users.findMyUser({
+      "user.fields": [
+        "id",
+        "name",
+        "username",
+        "profile_image_url",
+        "description",
+        "public_metrics",
+      ],
+    })
+    if (twitterUserResponse.data?.username !== "ChristmasEveBot")
+      throw new Error("only @ChristmasEveBot is allowed to authenticate")
+
     await storeAuthData(token)
 
     // Return tokens as plaintext for the bot to capture
