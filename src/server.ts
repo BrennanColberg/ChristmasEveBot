@@ -18,15 +18,10 @@ app.get("/", (req, res) => {
   res.type("text/plain").send(`ChristmasEveBot v2 Server
 
 Available endpoints:
-- GET /oauth - OAuth status and available endpoints
-- GET /oauth/start?botId=<id> - Begin Twitter OAuth flow
+- GET /oauth?API_KEY=<api_key> - Begin Twitter OAuth flow
 - GET /oauth/callback - OAuth callback (configure this in your Twitter app)
-- GET /oauth/bot/<botId> - Retrieve stored bot auth tokens
-- DELETE /oauth/bot/<botId> - Delete stored bot auth tokens
-- POST /oauth/test - Test an access token
-- POST /api/post - Post Christmas Eve tweet (requires botId and x-api-key)
-
-For OAuth setup, see OAUTH.md`)
+- POST /oauth/test - Test the stored access token
+- POST /api/post - Post Christmas Eve tweet (requires x-api-key=<api_key>)`)
 })
 
 app.listen(port, () => {

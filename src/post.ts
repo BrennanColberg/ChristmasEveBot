@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from "express"
 import { redis } from "bun"
+import { REDIS_KEY } from "./oauth"
 
 const router = express.Router()
 
@@ -12,12 +13,6 @@ interface BotAuthData {
   created_at: number
 }
 
-async function getBotAuth(botId: string): Promise<BotAuthData | null> {
-  const key = `bot:auth:${botId}`
-  const data = await redis.get(key)
-  return data ? JSON.parse(data as string) : null
-}
-
 // Christmas Eve bot posting logic
 router.post("/", async (req: Request, res: Response) => {
   // Request must use POST method (already enforced by route)
@@ -28,18 +23,10 @@ router.post("/", async (req: Request, res: Response) => {
     return res.status(401).json({ error: "Unauthorized - invalid API key" })
   }
 
-  // Get botId from request body or query
-  const { botId } = req.body || req.query
-  if (!botId || typeof botId !== "string") {
-    return res.status(400).json({ error: "botId is required" })
-  }
-
   try {
     // Get bot auth tokens from Redis
-    const authData = await getBotAuth(botId)
-    if (!authData) {
-      return res.status(404).json({ error: `No auth data found for bot: ${botId}` })
-    }
+    const authData = await redis.get(REDIS_KEY)
+    if (!authData) return res.status(404).json({ error: `No auth data found for bot` })
 
     // Get current date
     const now = new Date()
@@ -126,7 +113,6 @@ router.post("/", async (req: Request, res: Response) => {
 
     // Return lots of info for easy API debugging
     res.status(201).json({
-      botId,
       now,
       year,
       month,
